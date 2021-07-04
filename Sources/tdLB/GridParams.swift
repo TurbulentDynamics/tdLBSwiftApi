@@ -9,19 +9,22 @@ import Foundation
 
 
 /// This struct reads the json file that holds the meta information to read the binary files. The binary files can be written by C++ or Swift.
-public struct ComputeUnitParams: Codable {
+public struct GridParams: Codable {
     //https://app.quicktype.io#
 
-    public var i0: UInt64 = 0
-    public var j0: UInt64 = 0
-    public var k0: UInt64 = 0
+    public var x: UInt64 = 0
+    public var y: UInt64 = 0
+    public var z: UInt64 = 0
 
+    public var ngx: Int = 0
+    public var ngy: Int = 0
+    public var ngz: Int = 0
 
 }
 
-extension ComputeUnitParams {
+extension GridParams {
     public init(data: Data) throws {
-        self = try newJSONDecoder().decode(ComputeUnitParams.self, from: data)
+        self = try newJSONDecoder().decode(GridParams.self, from: data)
     }
 
     public init(_ json: String, using encoding: String.Encoding = .utf8) throws {
@@ -36,15 +39,20 @@ extension ComputeUnitParams {
     }
 
     func with(
-        i0: UInt64? = nil,
-        j0: UInt64? = nil,
-        k0: UInt64? = nil
-    ) -> ComputeUnitParams {
-        return ComputeUnitParams(
-            i0: i0 ?? self.i0,
-            j0: j0 ?? self.j0,
-            k0: k0 ?? self.k0
-        )
+        x: UInt64? = nil,
+        y: UInt64? = nil,
+        z: UInt64? = nil,
+        ngx: Int? = nil,
+        ngy: Int? = nil,
+        ngz: Int? = nil
+    ) -> GridParams {
+        return GridParams(
+            x: x ?? self.x,
+            y: y ?? self.y,
+            z: z ?? self.z,
+            ngx: ngx ?? self.ngx,
+            ngy: ngy ?? self.ngy,
+            ngz: ngz ?? self.ngz        )
     }
 
 
