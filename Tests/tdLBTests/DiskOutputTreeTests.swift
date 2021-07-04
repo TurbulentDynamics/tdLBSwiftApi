@@ -70,4 +70,21 @@ class DiskOutputTreeTests: XCTestCase {
         //            XCTAssertThrowsError
     }
 
+    
+    
+    func testFindLongestCommonPath() {
+
+        let o = try! DiskOutputTree(rootDir: testRootDirURL)
+        
+        //Many dirs with different steps
+        let test = ["/media/SmallSampleData/plot_output_np1_gridx44/plot.XZplane.V5.step_00000020",
+        "/media/SmallSampleData/plot_output_np1_gridx44/plot.XZplane.V5.step_00000030",
+        "/media/SmallSampleData/plot_output_np1_gridx44/plot.XZplane.V5.step_00000040"]
+    
+        XCTAssertEqual(o.findLongestCommonPath(test), "/media/SmallSampleData/plot_output_np1_gridx44")
+
+    }
+    
+    
+    
 }

@@ -1,4 +1,4 @@
-// swift-tools-version:5.0
+// swift-tools-version:5.4
 // The swift-tools-version declares the minimum version of Swift required to build this package.
 
 import PackageDescription
@@ -6,7 +6,7 @@ import PackageDescription
 let package = Package(
     name: "tdLBSwiftApi",
     platforms: [
-        .macOS(.v10_12)
+        .macOS(.v11)
 //        .iOS(.v13)
     ],
     products: [
@@ -27,8 +27,10 @@ let package = Package(
             dependencies: []),
         .target(
             name: "tdLBGeometry",
-            dependencies: ["tdLB"]),
-
+            dependencies: ["tdLB"],
+            resources: [
+                .process("dragon.ply")
+            ]),
         .testTarget(
             name: "tdLBTests",
             dependencies: ["tdLB"]),

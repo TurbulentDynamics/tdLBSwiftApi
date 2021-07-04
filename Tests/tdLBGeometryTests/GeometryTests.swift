@@ -1,5 +1,5 @@
 import XCTest
-@testable import tdLBGeometry
+//@testable import tdLBGeometry
 
 final class GeometryTests: XCTestCase {
     func testExample() {

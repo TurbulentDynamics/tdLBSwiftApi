@@ -46,31 +46,22 @@ extension URL {
 ///
 ///```
 ///SmallSampleData
-///├── plot.volume.V5.step_00000050
-///│   ├── Qvec.F3.node.0.0.0.V5.bin
-///│   ├── Qvec.F3.node.0.0.0.V5.bin.json
-///│   ├── ...
-///│   ├── Qvec.node.1.1.1.V5.bin
-///│   └── Qvec.node.1.1.1.V5.bin.json
-///└── plot_slice.XZplane.V5.step_00000050.cut_28
-///    ├── Qvec.node.0.1.0.V5.bin
-///    ├── Qvec.node.0.1.0.V5.bin.json
-///    ├── Qvec.F3.node.0.1.0.V5.bin
-///    ├── Qvec.F3.node.0.1.0.V5.bin.json
-///    ├── plot_slice.XZplane.V5.step_00000050.cut_28.rho.bin
-///    ├── plot_slice.XZplane.V5.step_00000050.cut_28.ux.bin
-///    ├── plot_slice.XZplane.V5.step_00000050.cut_28.uy.bin
-///    └── plot_slice.XZplane.V5.step_00000050.cut_28.uz.bin
+///├── plot_output_np1_gridx44
+///│   └── plot.XZplane.V5.step_00000020.cut_14
+///│       ├── CUid.0.0.0.V5.F3.bin
+///│       ├── CUid.0.0.0.V5.F3.bin.json
+///│       ├── CUid.0.0.0.V5.QVec.bin
+///│       └── CUid.0.0.0.V5.QVec.bin.json
+///└── plot_output_np8_gridx44
+///    ├── plot.volume.V5.step_00000050
+///    │   ├── CUid.1.1.1.V5.QVec.bin
+///    │   ├── CUid.1.1.1.V5.QVec.bin.json
 ///```
 public struct DiskOutputTree {
 
-    //    public let fm = FileManager.default
-
-    public var rootDir: URL
+    public var rootDir: URL! = URL(fileURLWithPath: ".")
 
     let grid: Grid = Grid(x: 0, y: 0, z: 0, ngx: 0, ngy: 0, ngz: 0)
-    //    let cuJson: ComputeUnitJson
-    //    let flow: Flow<T>
 
     let PlotFilesVersion: Int = 5
 
@@ -107,18 +98,20 @@ public struct DiskOutputTree {
     /// Figure out the root directory from an array of strings
     public init(dirs: [String]) throws {
 
-        //TODO
-        //find the root dir in /xx/xx/rootDir/.*types.step_0000000
+        let commonDir = self.findLongestCommonPath(dirs)
         
-        self.rootDir = URL(fileURLWithPath: "PossibleRootDir", isDirectory: true)
-        
-        guard self.dirExists(self.rootDir) else {
-            fatalError("Cannot determine root Dir")
+        let commonDirURL = URL(fileURLWithPath: commonDir, isDirectory: true)
+
+        guard self.dirExists(commonDirURL) else {
+            fatalError("Cannot determine root Dir, tried \(commonDir)")
         }
+
+        self.rootDir = commonDirURL
     }
     
 
-
+    
+    
 
 
     public init() throws {
@@ -157,6 +150,52 @@ public struct DiskOutputTree {
         return fm.fileExists(atPath: fullPath.path)
     }
 
+    
+    /**
+     Returns the longest common path
+     
+     Example:
+     /media/SmallSampleData/plot_output_np1_gridx44/plot.XZplane.V5.step_00000020
+     /media/SmallSampleData/plot_output_np1_gridx44/plot.XZplane.V5.step_00000030
+     /media/SmallSampleData/plot_output_np1_gridx44/plot.XZplane.V5.step_00000040
+     
+     Returns the rootDir eg /media/SmallSampleData/plot_output_np1_gridx44
+     
+     - Parameter dirs: List of Strings
+
+     - Returns: A new string
+     */
+    public func findLongestCommonPath(_ strs: [String]) -> String {
+    //https://www.programmersought.com/article/6640586957/
+    
+        var dirs = [[String]]()
+        for s in strs {
+            dirs.append(s.components(separatedBy: "/"))
+        }
+        
+        if dirs.count == 0{
+            return ""
+        }else if dirs.count == 1 {
+            return dirs.first!.joined(separator: "/")
+        }else{
+            var result = [String]()
+            for (index, a) in dirs.first!.enumerated() {
+                for dir in dirs[1..<dirs.count] {
+                    if index < dir.count {
+                        if a != dir[dir.index(dir.startIndex, offsetBy: index)] {
+                            return result.joined(separator: "/")
+                        }
+                    }else{
+                        return result.joined(separator: "/")
+                    }
+                }
+                result.append(a)
+            }
+            return result.joined(separator: "/")
+        }
+    }
+    
+    
     // MARK: Format dirs
 
     private func formatVersion(_ version: Int) -> String {
@@ -220,12 +259,12 @@ public struct DiskOutputTree {
         return plotDir.appendingPathComponent(formatCUid(idi: idi, idj: idj, idk: idk) + ".Force.bin")
     }
 
-    func qVecBinFileJSON(plotDir: URL, idi: Int, idj: Int, idk: Int) -> URL {
+    public func qVecBinFileJSON(plotDir: URL, idi: Int, idj: Int, idk: Int) -> URL {
 
         return qVecBinFile(plotDir: plotDir, idi: idi, idj: idj, idk: idk).appendingPathExtension(".json")
     }
 
-    func forceBinFileJSON(plotDir: URL, idi: Int, idj: Int, idk: Int) -> URL {
+    public func forceBinFileJSON(plotDir: URL, idi: Int, idj: Int, idk: Int) -> URL {
 
         return forceBinFile(plotDir: plotDir, idi: idi, idj: idj, idk: idk).appendingPathExtension(".json")
     }
@@ -243,7 +282,7 @@ public struct DiskOutputTree {
         return (44, 44, 44)
     }
 
-    public func confirmHeigfhtWidthSizes(from files: [URL]) -> (Int, Int) {
+    public func confirmHeightWidthSizes(from files: [URL]) -> (Int, Int) {
         //TODO cycle through all binfile jsons
         //Confirm all height and width are the same
         //return the height and width
@@ -321,10 +360,9 @@ public struct DiskOutputTree {
         }
 
         return filteredDirNames
-
     }
-
-    func findOrthoPlaneDirs(orientation: OrthoPlaneOrientation, cutAt: Int? = nil, step: tStep? = nil) -> [URL] {
+    
+    public func findOrthoPlaneDirs(orientation: OrthoPlaneOrientation, cutAt: Int? = nil, step: tStep? = nil) -> [URL] {
 
         //plot.XYplane.V5.step_00000010.cut_14
 

@@ -1,5 +1,5 @@
 import XCTest
-@testable import tdLB
+//@testable import tdLB
 
 final class ApiTests: XCTestCase {
     func testExample() {
