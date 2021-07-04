@@ -108,6 +108,17 @@ public struct Grid {
     let ngx, ngy, ngz: Int
 }
 
+public enum OrthoPlaneOrientation: CaseIterable {
+    case xyPlane
+    case xzPlane
+    case yzPlane
+}
+
+public enum Reference {
+    case relative
+    case absolute
+}
+
 public enum QVecType {
     case Double
     case Single

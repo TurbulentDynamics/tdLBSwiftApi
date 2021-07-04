@@ -18,19 +18,13 @@ public enum diskErrors: Error {
     case otherDiskError
 }
 
-public enum OrthoPlaneOrientation {
-    case xyPlane
-    case xzPlane
-    case yzPlane
-}
-
 public enum PlotDirKind: CaseIterable {
-    case xyPlane
-    case xzPlane
-    case yzPlane
-    case orthoAngle
+    case xyOrthoPlane
+    case xzOrthoPlane
+    case yzOrthoPlane
     case volume
-    //    case Sector
+    //    case angle
+    //    case sector
 }
 
 extension URL {
@@ -59,7 +53,7 @@ extension URL {
 ///```
 public struct DiskOutputTree {
 
-    public var rootDir: URL! = URL(fileURLWithPath: ".")
+    public var rootDir: URL = URL(fileURLWithPath: ".")
 
     let grid: Grid = Grid(x: 0, y: 0, z: 0, ngx: 0, ngy: 0, ngz: 0)
 
@@ -110,8 +104,6 @@ public struct DiskOutputTree {
     }
     
 
-    
-    
 
 
     public init() throws {
@@ -212,19 +204,19 @@ public struct DiskOutputTree {
 
     public func xyPlaneDir(step: tStep, atK: tNi, prefix: String = "plot") -> String {
 
-        return formatDir(prefix: prefix, plotType: "XYplane", step: step) + ".cut_\(atK)"
+        return formatDir(prefix: prefix, plotType: "xyPlane", step: step) + ".cut_\(atK)"
     }
 
     //Formally Slice
     public func yzPlaneDir(step: tStep, atI: tNi, prefix: String = "plot") -> String {
 
-        return formatDir(prefix: prefix, plotType: "YZplane", step: step) + ".cut_\(atI)"
+        return formatDir(prefix: prefix, plotType: "yzPlane", step: step) + ".cut_\(atI)"
     }
 
     //Formally Axis
     public func xzPlaneDir(step: tStep, atJ: tNi, prefix: String = "plot") -> String {
 
-        return formatDir(prefix: prefix, plotType: "YZplane", step: step) + ".cut_\(atJ)"
+        return formatDir(prefix: prefix, plotType: "xzPlane", step: step) + ".cut_\(atJ)"
     }
 
     public func volumeDir(step: tStep, prefix: String = "plot") -> String {
@@ -239,12 +231,12 @@ public struct DiskOutputTree {
 
     public func axisWhenBladeAngleDir(step: tStep, angle: Int, prefix: String = "plot") -> String {
 
-        return formatDir(prefix: prefix, plotType: "YZplane", step: step) + ".angle_\(angle)"
+        return formatDir(prefix: prefix, plotType: "yzAnglePlane", step: step) + ".angle_\(angle)"
     }
 
     public func rotatingSectorDir(step: tStep, angle: Int, prefix: String = "plot") -> String {
 
-        return "Undefined_Sector"
+        return formatDir(prefix: prefix, plotType: "sector", step: step) + ".angle1_\(angle)" +  ".angle2_\(angle)"
     }
 
     private func formatCUid(idi: Int, idj: Int, idk: Int) -> String {
@@ -256,7 +248,7 @@ public struct DiskOutputTree {
     }
 
     public func forceBinFile(plotDir: URL, idi: Int, idj: Int, idk: Int) -> URL {
-        return plotDir.appendingPathComponent(formatCUid(idi: idi, idj: idj, idk: idk) + ".Force.bin")
+        return plotDir.appendingPathComponent(formatCUid(idi: idi, idj: idj, idk: idk) + ".F3.bin")
     }
 
     public func qVecBinFileJSON(plotDir: URL, idi: Int, idj: Int, idk: Int) -> URL {
@@ -290,9 +282,9 @@ public struct DiskOutputTree {
         return (44, 44)
     }
 
-    public func loadBinFileJson(from file: URL) -> BinFileFormat? {
+    public func loadBinFileJson(from file: URL) -> BinFileParams? {
         do {
-            return try BinFileFormat(file)
+            return try BinFileParams(file)
         }
         catch {
             print("Cannot load json at \(file.path)")
@@ -436,11 +428,11 @@ public struct DiskOutputTree {
     }
 
     public func findForceBin(at dir: URL) -> [URL] {
-        return findFiles(at: dir, withRegex: "^CUid.*\\.Force\\.bin$")
+        return findFiles(at: dir, withRegex: "^CUid.*\\.F3\\.bin$")
     }
 
     public func findForceBinJson(at dir: URL) -> [URL] {
-        return findFiles(at: dir, withRegex: "^CUid.*\\.Force\\.bin\\.json$")
+        return findFiles(at: dir, withRegex: "^CUid.*\\.F3\\.bin\\.json$")
     }
 
     // MARK: Query Dirs
@@ -470,21 +462,21 @@ public struct DiskOutputTree {
     public func dirKind(dir: URL) -> PlotDirKind? {
         let plotStr = dir.lastPathComponent
 
-        if plotStr.contains("XYPlane") {
-            return .xyPlane
+        if plotStr.contains("xyPlane") {
+            return .xyOrthoPlane
         }
-        else if plotStr.contains("XZPlane") {
-            return .xzPlane
+        else if plotStr.contains("xzPlane") {
+            return .xzOrthoPlane
         }
-        else if plotStr.contains("YZPlane") {
-            return .xzPlane
+        else if plotStr.contains("yzPlane") {
+            return .yzOrthoPlane
         }
-        else if plotStr.contains("OrthoAngle") {
-            return .orthoAngle
-        }
-        else if plotStr.contains("Volume") {
+        else if plotStr.contains("volume") {
             return .volume
         }
+//        else if plotStr.contains("OrthoAngle") {
+//            return .orthoAngle
+//        }
         //        if plotStr.contains("Sector") {return .Sector}
         return nil
     }

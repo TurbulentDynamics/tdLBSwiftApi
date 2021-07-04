@@ -7,58 +7,34 @@
 //
 import Foundation
 
-public struct ComputeUnitJson: Codable {
-}
-
 /// This struct reads the json file that holds the meta information to read the binary files. The binary files can be written by C++ or Swift.
 ///
-public struct BinFileFormat: Codable {
+public struct BinFileParams: Codable {
     //https://app.quicktype.io#
 
-    //    public var binURL:URL
+    public let name, note, structName: String
 
-    public var qDataType: String = ""
-    public var qOutputLength: Int = 0
-    public var binFileSizeInStructs: Int = 0
-    public var coordsType: String = ""
-    public var hasColRowtCoords: Bool = false
-    public var hasGridtCoords: Bool = false
+    public let qDataType: String
+    public let qOutputLength: Int
+    public let binFileSizeInStructs: UInt64
+    public let coordsType: String
+    public let filePath: String
+    public let hasColRowtCoords, hasGridtCoords: Bool
 
-    //
-    //    public var gridX:Int = 0
-    //    public var gridY:Int = 0
-    //    public var gridZ:Int = 0
-    //
-    //    public var ngx:Int = 0
-    //    public var ngy:Int = 0
-    //    public var ngz:Int = 0
-    //
-    //    public var idi:Int = 0
-    //    public var idj:Int = 0
-    //    public var idk:Int = 0
-    //
-    //
-    //    public var x0:Int = 0
-    //    public var y0:Int = 0
-    //    public var z0:Int = 0
+    public let reference: String
+    public let i0, j0, k0: UInt64
 
-    public var cutAt: Int = 0
-    //    public var initialRho: Double = 0.0
-    //    public var reMNondimensional: Int = 0
-    //    public var step: Int = 0
-    public var teta: Double = 0.0
-    //    public var uav: Double = 0.0
-    public var note: String = ""
-
-    //    public var jsonURL:URL {
-    //        binURL.appendingPathExtension(".json")
-    //    }
+    enum CodingKeys: String, CodingKey {
+        case qDataType = "QDataType"
+        case qOutputLength = "QOutputLength"
+        case binFileSizeInStructs, coordsType, filePath, hasColRowtCoords, hasGridtCoords, name, note, structName, reference, i0, j0, k0
+    }
 
 }
 
-extension BinFileFormat {
+extension BinFileParams {
     public init(data: Data) throws {
-        self = try newJSONDecoder().decode(BinFileFormat.self, from: data)
+        self = try newJSONDecoder().decode(BinFileParams.self, from: data)
     }
 
     public init(_ json: String, using encoding: String.Encoding = .utf8) throws {
@@ -72,80 +48,41 @@ extension BinFileFormat {
         try self.init(data: try Data(contentsOf: url))
     }
 
-    public init(
-        qDataType: String,
-        qOutputLength: Int,
-        binFileSizeInStructs: Int,
-        coordsType: String,
-        hasColRowtCoords: Bool,
-        hasGridtCoords: Bool
-    ) {
-        self.qDataType = qDataType
-        self.qOutputLength = qOutputLength
-        self.binFileSizeInStructs = binFileSizeInStructs
-        self.coordsType = coordsType
-        self.hasColRowtCoords = hasColRowtCoords
-        self.hasGridtCoords = hasGridtCoords
-    }
 
-    //    public init(qDataType: String,
-    //                qOutputLength: Int,
-    //                binFileSizeInStructs: Int,
-    //                coordsType: String,
-    //                hasColRowtCoords: Bool,
-    //                hasGridtCoords: Bool,
-    //                grid: GridParams){
-    //        self.qDataType = qDataType
-    //        self.qOutputLength = qOutputLength
-    //        self.binFileSizeInStructs = binFileSizeInStructs
-    //        self.coordsType = coordsType
-    //        self.hasColRowtCoords = hasColRowtCoords
-    //        self.hasGridtCoords = hasGridtCoords
-    //
-    //        self.gridX = grid.x
-    //        self.gridY = grid.y
-    //        self.gridZ = grid.z
-    //    }
+//    func with(
+//        qDataType: String? = nil,
+//        qOutputLength: Int? = nil,
+//        binFileSizeInStructs: UInt64? = nil,
+//        coordsType: String? = nil,
+//        filePath: String? = nil,
+//        hasColRowtCoords: Bool? = nil,
+//        hasGridtCoords: Bool? = nil,
+//        name: String? = nil,
+//        note: String? = nil,
+//        structName: String? = nil,
+//        reference: String? = nil,
+//        i0: UInt64? = nil,
+//        j0: UInt64? = nil,
+//        k0: UInt64? = nil
+//    ) -> BinFileParams {
+//        return BinFileParams(
+//            qDataType: qDataType ?? self.qDataType,
+//            qOutputLength: qOutputLength ?? self.qOutputLength,
+//            binFileSizeInStructs: binFileSizeInStructs ?? self.binFileSizeInStructs,
+//            coordsType: coordsType ?? self.coordsType,
+//            filePath: filePath ?? self.filePath,
+//            hasColRowtCoords: hasColRowtCoords ?? self.hasColRowtCoords,
+//            hasGridtCoords: hasGridtCoords ?? self.hasGridtCoords,
+//            name: name ?? self.name,
+//            note: note ?? self.note,
+//            structName: structName ?? self.structName,
+//            reference: reference ?? self.reference,
+//            i0: i0 ?? self.i0,
+//            j0: j0 ?? self.j0,
+//            k0: k0 ?? self.k0
+//        )
+//    }
 
-    //    public func with(
-    //        qDataType: String? = nil,
-    //        qOutputLength: Int? = nil,
-    //        binFileSizeInStructs: Int? = nil,
-    //        coordsType: String? = nil,
-    //        gridX: Int? = nil,
-    //        gridY: Int? = nil,
-    //        gridZ: Int? = nil,
-    //        hasColRowtCoords: Bool? = nil,
-    //        hasGridtCoords: Bool? = nil,
-    //        idi: Int? = nil,
-    //        idj: Int? = nil,
-    //        idk: Int? = nil,
-    //        name: String? = nil,
-    //        ngx: Int? = nil,
-    //        ngy: Int? = nil,
-    //        ngz: Int? = nil,
-    //        structName: String? = nil
-    //    ) -> QVecDim {
-    //        return QVecDim(
-    //            qDataType: qDataType ?? self.qDataType,
-    //            qOutputLength: qOutputLength ?? self.qOutputLength,
-    //            binFileSizeInStructs: binFileSizeInStructs ?? self.binFileSizeInStructs,
-    //            coordsType: coordsType ?? self.coordsType,
-    //            gridX: gridX ?? self.gridX,
-    //            gridY: gridY ?? self.gridY,
-    //            gridZ: gridZ ?? self.gridZ,
-    //            hasColRowtCoords: hasColRowtCoords ?? self.hasColRowtCoords,
-    //            hasGridtCoords: hasGridtCoords ?? self.hasGridtCoords,
-    //            idi: idi ?? self.idi,
-    //            idj: idj ?? self.idj,
-    //            idk: idk ?? self.idk,
-    //            name: name ?? self.name,
-    //            ngx: ngx ?? self.ngx,
-    //            ngy: ngy ?? self.ngy,
-    //            ngz: ngz ?? self.ngz,
-    //            structName: structName ?? self.structName
-    //        )
-    //    }
 
     public func jsonData() throws -> Data {
         return try newJSONEncoder().encode(self)
@@ -167,6 +104,12 @@ extension BinFileFormat {
         //TODO Complete or replace
         if coordsType == "uint16_t" {
             return "UInt16"
+        }
+        if coordsType == "uint32_t" {
+            return "UInt32"
+        }
+        if coordsType == "uint64_t" {
+            return "UInt64"
         }
         else if coordsType == "Int" {
             fatalError("Cannot determine size of type Int, could be 32 or 64 bits.")
@@ -190,8 +133,8 @@ extension BinFileFormat {
         else if ["UInt32", "Int32"].contains(coordsType) {
             return 4
 
-            //        } else if ["UInt64", "Int64"].contains(coordsType) {
-            //            return 8
+        } else if ["UInt64", "Int64"].contains(coordsType) {
+            return 8
 
         }
         else if coordsType == "Int" {
@@ -207,11 +150,12 @@ extension BinFileFormat {
         switch coordsType {
         //            case "Int8":
         //                return Int8.self as AnyObject
-        case "Int16":
-            return Int16.self as AnyObject
-        case "Int32":
-            return Int32.self as AnyObject
-        //            case "Int64":
+        case "UInt16":
+            return UInt16.self as AnyObject
+        case "UInt32":
+            return UInt32.self as AnyObject
+        case "UInt64":
+            return UInt64.self as AnyObject        //            case "Int64":
         //                return Int64.self as AnyObject
         default:
             fatalError("Cannot determine size of type \(coordsType)")

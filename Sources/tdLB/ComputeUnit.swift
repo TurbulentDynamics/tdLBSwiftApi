@@ -15,6 +15,9 @@ public struct ComputeUnit<TQ: BinaryFloatingPoint> {
     public var x: Int
     public var y: Int
     public var z: Int
+    public var i0: Int
+    public var j0: Int
+    public var k0: Int
     public var qLen: QLen
 
     public var Q: [[[QVec<TQ>]]]
@@ -24,10 +27,13 @@ public struct ComputeUnit<TQ: BinaryFloatingPoint> {
 
     var outputTree: DiskOutputTree
 
-    init(outputTree: DiskOutputTree, withQVec initial: QVec<TQ>, x: Int, y: Int, z: Int, qLen: QLen) {
+    init(outputTree: DiskOutputTree, withQVec initial: QVec<TQ>, x: Int, y: Int, z: Int, i0: Int, j0: Int, k0: Int, qLen: QLen) {
         self.x = x
         self.y = y
         self.z = z
+        self.i0 = i0
+        self.j0 = j0
+        self.k0 = k0
         self.qLen = qLen
         self.outputTree = outputTree
 
@@ -37,10 +43,13 @@ public struct ComputeUnit<TQ: BinaryFloatingPoint> {
         O = Array(repeating: Array(repeating: Array(repeating: false, count: z), count: y), count: x)
     }
 
-    init(outputTree: DiskOutputTree, with initialVal: TQ, x: Int, y: Int, z: Int, qLen: QLen) {
+    init(outputTree: DiskOutputTree, with initialVal: TQ, x: Int, y: Int, z: Int, i0: Int, j0: Int, k0: Int, qLen: QLen) {
         self.x = x
         self.y = y
         self.z = z
+        self.i0 = i0
+        self.j0 = j0
+        self.k0 = k0
         self.qLen = qLen
         self.outputTree = outputTree
 
